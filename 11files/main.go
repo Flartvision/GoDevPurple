@@ -2,7 +2,6 @@ package main
 
 import (
 	"files/account"
-	"files/files"
 
 	//"files/files"
 	"fmt"
@@ -11,12 +10,14 @@ import (
 )
 
 func main() {
+
 	menu()
 
 }
 
 func menu() {
 	var userCh int
+	vault := account.NewVault()
 
 	for {
 		fmt.Println("Выберите функцию:")
@@ -28,13 +29,13 @@ func menu() {
 
 		switch userCh {
 		case 1:
-			crAcc()
+			crAcc(vault)
 			continue
 		case 2:
-			findAcc()
+			findAcc(vault)
 			continue
 		case 3:
-			delAcc()
+			delAcc(vault)
 			continue
 		default:
 			return
@@ -44,7 +45,7 @@ func menu() {
 
 }
 
-func crAcc() {
+func crAcc(vault *account.Vault) {
 	login := promptData("Введите логин")
 	password := promptData("Введите пароль")
 	url := promptData("Введите URL")
@@ -55,23 +56,29 @@ func crAcc() {
 		return
 	}
 
-	vault := account.NewVault()
 	vault.AddAccount(*myAccount)
-	data, err := vault.ToBytes()
+
+}
+
+func findAcc(vault *account.Vault) {
+	var findUrl string
+	fmt.Println("Введите URL необходимого аккаунта")
+	fmt.Scanln(&findUrl)
+
+	res, err := vault.FindAccByURL(findUrl)
 	if err != nil {
-		fmt.Println("Не удалось преобразовать в JSON")
-		return
+		fmt.Println(err)
+
 	}
-	files.WriteF(data, "data.json")
+	fmt.Println(res)
 
 }
 
-func findAcc() {
-	fmt.Println("Заглушка для поиска")
-}
+func delAcc(vault *account.Vault) {
+	url := promptData("Введите URL аккаунта для удаления")
+	isDeleted := vault.DeleteAccByUrl(url)
 
-func delAcc() {
-	fmt.Println("Заглушка для удаления")
+	fmt.Println(isDeleted)
 }
 
 func promptData(prompt string) string {

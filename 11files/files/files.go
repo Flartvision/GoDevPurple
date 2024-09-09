@@ -22,11 +22,11 @@ func WriteF(content []byte, name string) {
 }
 
 func ReadF(name string) ([]byte, error) {
-	d, err := os.ReadFile("file.txt")
+	d, err := os.ReadFile("data.json")
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 
 	}
-	return d, err
+	return d, nil
 
 }

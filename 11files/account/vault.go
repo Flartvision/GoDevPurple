@@ -2,7 +2,10 @@ package account
 
 import (
 	"encoding/json"
+	"errors"
 	"files/files"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -46,4 +49,42 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 		return nil, err
 	}
 	return file, nil
+}
+
+func (vault *Vault) FindAccByURL(url string) ([]Account, error) {
+	var finder []Account
+	for _, v := range vault.Accounts {
+		if strings.Contains(v.Url, url) {
+			finder = append(finder, v)
+			fmt.Println(v.Login, v.Password)
+		}
+		continue
+	}
+	if finder == nil {
+		return nil, errors.New("Аккаунтов не найдено")
+	}
+	return finder, nil
+}
+
+func (vault *Vault) DeleteAccByUrl(url string) bool {
+	var accounts []Account
+	isDeleted := false
+	for _, acc := range vault.Accounts {
+		isMatched := strings.Contains(acc.Url, url)
+		if !isMatched {
+			accounts = append(accounts, acc)
+			continue
+
+		}
+		isDeleted = true
+	}
+
+	vault.UpdatedAt = time.Now()
+	data, err := vault.ToBytes()
+	if err != nil {
+		color.Red("Не удалось преобразовать JSON")
+	}
+	files.WriteF(data, "data.json")
+	return isDeleted
+
 }
