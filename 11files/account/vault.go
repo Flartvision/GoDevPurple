@@ -13,7 +13,7 @@ import (
 
 type Vault struct {
 	Accounts  []Account `json:"accounts"`
-	UpdatedAt time.Time `json: "updatedAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 func NewVault() *Vault {
@@ -61,7 +61,7 @@ func (vault *Vault) FindAccByURL(url string) ([]Account, error) {
 		continue
 	}
 	if finder == nil {
-		return nil, errors.New("Аккаунтов не найдено")
+		return nil, errors.New("аккаунтов не найдено")
 	}
 	return finder, nil
 }
