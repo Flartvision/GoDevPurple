@@ -14,9 +14,9 @@ import (
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPRSTUVXYZ123456-*")
 
 type Account struct {
-	Login    string `json: "login"`
-	Password string `json: "password"`
-	Url      string `json: "url"`
+	Login    string `json:"login"`
+	Password string `json:"password"`
+	Url      string `json:"url"`
 }
 
 func (acc *Account) OutPass() {

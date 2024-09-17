@@ -2,6 +2,7 @@ package main
 
 import (
 	"files/account"
+	"files/files"
 
 	//"files/files"
 	"fmt"
@@ -17,7 +18,7 @@ func main() {
 
 func menu() {
 	var userCh int
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
 
 	for {
 		fmt.Println("Выберите функцию:")
@@ -45,7 +46,7 @@ func menu() {
 
 }
 
-func crAcc(vault *account.Vault) {
+func crAcc(vault *account.VaultWithDb) {
 	login := promptData("Введите логин")
 	password := promptData("Введите пароль")
 	url := promptData("Введите URL")
@@ -60,7 +61,7 @@ func crAcc(vault *account.Vault) {
 
 }
 
-func findAcc(vault *account.Vault) {
+func findAcc(vault *account.VaultWithDb) {
 	var findUrl string
 	fmt.Println("Введите URL необходимого аккаунта")
 	fmt.Scanln(&findUrl)
@@ -74,7 +75,7 @@ func findAcc(vault *account.Vault) {
 
 }
 
-func delAcc(vault *account.Vault) {
+func delAcc(vault *account.VaultWithDb) {
 	url := promptData("Введите URL аккаунта для удаления")
 	isDeleted := vault.DeleteAccByUrl(url)
 
