@@ -1,6 +1,7 @@
 package files
 
 import (
+	"files/output"
 	"fmt"
 	"os"
 )
@@ -25,7 +26,7 @@ func (db *JsonDb) Write(content []byte) {
 	_, err = f.Write(content)
 	defer f.Close()
 	if err != nil {
-		fmt.Println(err)
+		output.PrintErr(err)
 		return
 	}
 	fmt.Println("Запись успешна")

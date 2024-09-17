@@ -3,9 +3,12 @@ package main
 import (
 	"files/account"
 	"files/files"
+	"files/output"
 
 	//"files/files"
 	"fmt"
+
+	"github.com/fatih/color"
 	//"strings"
 	//"strconv"
 )
@@ -53,7 +56,7 @@ func crAcc(vault *account.VaultWithDb) {
 
 	myAccount, err := account.NewAccount(login, password, url)
 	if err != nil {
-		fmt.Println("Неверный формат URL или login")
+		output.PrintErr("Неверный формат URL или Логин")
 		return
 	}
 
@@ -79,7 +82,10 @@ func delAcc(vault *account.VaultWithDb) {
 	url := promptData("Введите URL аккаунта для удаления")
 	isDeleted := vault.DeleteAccByUrl(url)
 
-	fmt.Println(isDeleted)
+	if isDeleted {
+		color.Green("Удалено")
+	}
+	output.PrintErr("Не найдено")
 }
 
 func promptData(prompt string) string {
