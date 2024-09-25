@@ -78,12 +78,13 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func (vault *VaultWithDb) FindAccByURL(url string) ([]Account, error) {
+func (vault *VaultWithDb) FindAcc(str string, checker func(Account, string)bool) ([]Account, error) {
 	var finder []Account
 	for _, v := range vault.Accounts {
-		if strings.Contains(v.Url, url) {
-			finder = append(finder, v)
-			fmt.Println(v.Login, v.Password)
+			isMatched := checker(v, str)
+			if isMatched {
+				finder = append(finder, v)
+				fmt.Println(v.Login, v.Password)
 		}
 		continue
 	}

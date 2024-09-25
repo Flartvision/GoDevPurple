@@ -4,7 +4,7 @@ import (
 	"files/account"
 	"files/files"
 	"files/output"
-
+    "strings"
 	//"files/files"
 	"fmt"
 
@@ -13,6 +13,13 @@ import (
 	//"strconv"
 )
 
+
+var menuMap = map[string]func(*account.VaultWithDb){
+		"1": crAcc,
+		"2": findAcc,
+		"3": delAcc,
+}
+
 func main() {
 
 	menu()
@@ -20,9 +27,10 @@ func main() {
 }
 
 func menu() {
-	var userCh int
+	var userCh string
 	vault := account.NewVault(files.NewJsonDb("data.json"))
 
+	 
 	for {
 		fmt.Println("Выберите функцию:")
 		fmt.Println("1. Создать аккаунт")
@@ -30,24 +38,30 @@ func menu() {
 		fmt.Println("3. Удалить аккаунт")
 		fmt.Println("4. Выход")
 		fmt.Scanln(&userCh)
+		
+		menuFunc := menuMap[userCh]
+		if menuFunc == nil {
+				break 
+		}
 
-		switch userCh {
-		case 1:
-			crAcc(vault)
-			continue
-		case 2:
-			findAcc(vault)
-			continue
-		case 3:
-			delAcc(vault)
-			continue
-		default:
-			return
+		menuFunc(vault)
+				//switch userCh {
+		//case 1:
+		//	crAcc(vault)
+		//	continue
+		//case 2:
+		//	findAcc(vault)
+		//	continue
+		//case 3:
+		//	delAcc(vault)
+		//	continue
+		//default:
+		//	return
 		}
 
 	}
 
-}
+
 
 func crAcc(vault *account.VaultWithDb) {
 	login := promptData("Введите логин")
@@ -69,7 +83,9 @@ func findAcc(vault *account.VaultWithDb) {
 	fmt.Println("Введите URL необходимого аккаунта")
 	fmt.Scanln(&findUrl)
 
-	res, err := vault.FindAccByURL(findUrl)
+	res, err := vault.FindAcc(findUrl, func(acc account.Account, str string)bool {
+			return strings.Contains(acc.Url, str)
+	})
 	if err != nil {
 		fmt.Println(err)
 
@@ -77,6 +93,9 @@ func findAcc(vault *account.VaultWithDb) {
 	fmt.Println(res)
 
 }
+
+
+
 
 func delAcc(vault *account.VaultWithDb) {
 	url := promptData("Введите URL аккаунта для удаления")
