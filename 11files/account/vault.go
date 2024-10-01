@@ -3,6 +3,7 @@ package account
 import (
 	"encoding/json"
 	"errors"
+	"files/encrypter"
 	"fmt"
 	"strings"
 	"time"
@@ -30,10 +31,11 @@ type Vault struct {
 
 type VaultWithDb struct {
 	Vault
-	db Db
+	db  Db
+	enc encrypter.Encrypter
 }
 
-func NewVault(db Db) *VaultWithDb {
+func NewVault(db Db, enc encrypter.Encrypter) *VaultWithDb {
 
 	file, err := db.Read()
 	if err != nil {
@@ -42,11 +44,13 @@ func NewVault(db Db) *VaultWithDb {
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
+	data := enc.Decrypt(file)
 	var vault Vault
-	err = json.Unmarshal(file, &vault)
+	err = json.Unmarshal(data, &vault)
 	if err != nil {
 		color.Red(err.Error())
 		return &VaultWithDb{
@@ -54,12 +58,14 @@ func NewVault(db Db) *VaultWithDb {
 				Accounts:  []Account{},
 				UpdatedAt: time.Now(),
 			},
-			db: db,
+			db:  db,
+			enc: enc,
 		}
 	}
 	return &VaultWithDb{
 		Vault: vault,
 		db:    db,
+		enc:   enc,
 	}
 
 }
@@ -78,13 +84,13 @@ func (vault *Vault) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-func (vault *VaultWithDb) FindAcc(str string, checker func(Account, string)bool) ([]Account, error) {
+func (vault *VaultWithDb) FindAcc(str string, checker func(Account, string) bool) ([]Account, error) {
 	var finder []Account
 	for _, v := range vault.Accounts {
-			isMatched := checker(v, str)
-			if isMatched {
-				finder = append(finder, v)
-				fmt.Println(v.Login, v.Password)
+		isMatched := checker(v, str)
+		if isMatched {
+			finder = append(finder, v)
+			fmt.Println(v.Login, v.Password)
 		}
 		continue
 	}
@@ -115,8 +121,9 @@ func (vault *VaultWithDb) DeleteAccByUrl(url string) bool {
 func (v *VaultWithDb) save() {
 	v.UpdatedAt = time.Now()
 	data, err := v.Vault.ToBytes()
+	encData := v.enc.Encrypt(data)
 	if err != nil {
 		color.Red("Не удалось преобразовать")
 	}
-	v.db.Write(data)
+	v.db.Write(encData)
 }
