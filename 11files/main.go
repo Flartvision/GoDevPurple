@@ -13,6 +13,7 @@ import (
 	//"strconv"
 )
 
+<<<<<<< Updated upstream
 
 var menuMap = map[string]func(*account.VaultWithDb){
 		"1": crAcc,
@@ -57,6 +58,33 @@ func menu() {
 		//	continue
 		//default:
 		//	return
+=======
+var menu = map[string]string{}
+
+func main() {
+	vault := account.NewVault(files.NewJsonDb("data.json"))
+	for {
+		variant := promptData([]string{
+			"1. Создать аккаунт",
+			"2. Найти аккаунт",
+			"3. Удалить аккаунт",
+			"4. Выход",
+			"Выберите функцию: ",
+		})
+
+		switch variant {
+		case "1":
+			crAcc(vault)
+			continue
+		case "2":
+			findAcc(vault)
+			continue
+		case "3":
+			delAcc(vault)
+			continue
+		default:
+			return
+>>>>>>> Stashed changes
 		}
 
 	}
@@ -64,9 +92,9 @@ func menu() {
 
 
 func crAcc(vault *account.VaultWithDb) {
-	login := promptData("Введите логин")
-	password := promptData("Введите пароль")
-	url := promptData("Введите URL")
+	login := promptData([]string{"Введите логин: "})
+	password := promptData([]string{"Введите пароль: "})
+	url := promptData([]string{"Введите URL: "})
 
 	myAccount, err := account.NewAccount(login, password, url)
 	if err != nil {
@@ -98,7 +126,7 @@ func findAcc(vault *account.VaultWithDb) {
 
 
 func delAcc(vault *account.VaultWithDb) {
-	url := promptData("Введите URL аккаунта для удаления")
+	url := promptData([]string{"Введите URL аккаунта для удаления"})
 	isDeleted := vault.DeleteAccByUrl(url)
 
 	if isDeleted {
@@ -107,8 +135,15 @@ func delAcc(vault *account.VaultWithDb) {
 	output.PrintErr("Не найдено")
 }
 
-func promptData(prompt string) string {
-	fmt.Println(prompt)
+func promptData[T any](prompt []T) string {
+	for i, v := range prompt {
+		if i == len(prompt)-1 {
+			fmt.Printf("%v", v)
+		} else {
+			fmt.Println(v)
+		}
+	}
+	//fmt.Println(prompt)
 	var res string
 	fmt.Scanln(&res)
 	return res
